@@ -7,13 +7,13 @@ from dotenv import load_dotenv
 # LOAD ENV
 # =========================
 load_dotenv()
-API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-if not API_KEY:
+if not OPENAI_API_KEY:
     st.error("OPENAI_API_KEY not found in .env")
     st.stop()
 
-client = OpenAI(api_key=API_KEY)
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 MODEL = "gpt-4o-mini"
 
