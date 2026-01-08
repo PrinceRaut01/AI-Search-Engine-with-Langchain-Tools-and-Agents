@@ -1,64 +1,50 @@
-import os
 import streamlit as st
-from openai import OpenAI
 from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 
-# LOAD ENV
+# =========================
+# ENV
+# =========================
 load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-if not OPENAI_API_KEY:
-    st.error("OPENAI_API_KEY not found in .env")
-    st.stop()
-
-client = OpenAI(api_key=OPENAI_API_KEY)
-
-MODEL = "gpt-4o-mini"
-
-# PAGE CONFIG
-st.set_page_config(
-    page_title="Bay_max",
-    page_icon="Bay_max",
-    layout="centered"
+# =========================
+# LLM (from your backend)
+# =========================
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0.2,
+    max_tokens=500
 )
 
-st.title("Bay_max")
+# =========================
+# AI SEARCH LOGIC
+# (merged backend.service)
+# =========================
+def ai_search(query: str) -> str:
+    prompt = f"""
+You are an AI search engine.
+Answer the user's question clearly and accurately.
 
+Question: {query}
+"""
+    response = llm.invoke(prompt)
+    return response.content
 
-# CHAT MEMORY (LIKE CHATGPT)
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "system", "content": "You are ChatGPT, a helpful assistant."}
-    ]
+# =========================
+# STREAMLIT UI (same as yours)
+# =========================
+st.set_page_config(page_title="AI Search Engine", layout="centered")
+st.title("AI Search Engine by Prince Raut")
+st.caption("AI: OpenAI | Framework: LangChain")
 
-# DISPLAY CHAT
-for msg in st.session_state.messages:
-    if msg["role"] == "user":
-        st.chat_message("user").write(msg["content"])
-    elif msg["role"] == "assistant":
-        st.chat_message("assistant").write(msg["content"])
+query = st.text_input("Ask your question")
 
+if st.button("Search"):
+    if query:
+        with st.spinner("Iam Giving you one of the best answer for your Question....."):
+            answer = ai_search(query)
 
-# USER INPUT
-user_input = st.chat_input("Send a message...")
-
-if user_input:
-    # Show user message
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    st.chat_message("user").write(user_input)
-
-    # AI response
-    with st.chat_message("assistant"):
-        with st.spinner("Answering as soon as possible ......."):
-            response = client.chat.completions.create(
-                model=MODEL,
-                messages=st.session_state.messages,
-                temperature=0.7
-            )
-
-            reply = response.choices[0].message.content
-            st.write(reply)
-
-    st.session_state.messages.append(
-        {"role": "assistant", "content": reply}
-    )
+        st.subheader("Answer")
+        st.write(answer)
+    else:
+        st.warning("Please enter a question")
