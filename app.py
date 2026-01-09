@@ -2,24 +2,20 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 
-# =========================
+
 # ENV
-# =========================
 load_dotenv()
 
-# =========================
+
 # LLM (from your backend)
-# =========================
 llm = ChatOpenAI(
     model="gpt-4o-mini",
     temperature=0.2,
     max_tokens=500
 )
 
-# =========================
-# AI SEARCH LOGIC
+
 # (merged backend.service)
-# =========================
 def ai_search(query: str) -> str:
     prompt = f"""
 You are an AI search engine.
@@ -30,9 +26,8 @@ Question: {query}
     response = llm.invoke(prompt)
     return response.content
 
-# =========================
-# STREAMLIT UI (same as yours)
-# =========================
+
+# STREAMLIT UI 
 st.set_page_config(page_title="AI Search Engine", layout="centered")
 st.title("AI Search Engine by Prince Raut")
 st.caption("AI: OpenAI | Framework: LangChain")
